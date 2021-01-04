@@ -1,0 +1,14 @@
+{
+    "name": "EEWL",
+    "keywords": "eeprom, wear leveling",
+    "description": "EEWL library allows to extend the EEPROM life by distributing data writes along a circular buffer.",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/fabriziop/EEWL.git"
+    },
+    "version": "0.1.0",
+    "exclude": "tests",
+    "examples": "examples/*/*.ino",
+    "frameworks": "arduino",
+    "platforms": [ "atmelavr" ]
+}
