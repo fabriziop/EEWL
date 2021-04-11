@@ -7,6 +7,7 @@
 .site       : Revello - Italy
 .creation   : 2-Jan-2021
 .copyright  : (c) 2021 Fabrizio Pollastri
+.license    : GNU Lesser General Public License
 
 .description
   This application counts the number of power up/down cycles. At each

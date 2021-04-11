@@ -7,7 +7,7 @@
 .site       : Torino - Italy
 .creation   : 16-Nov-2017
 .copyright  : (c) 2017 Fabrizio Pollastri
-.license    : GNU General Public License
+.license    : GNU Lesser General Public License
 
 .description
   EEPROMs have a limited number of write cycles, approximately in the
