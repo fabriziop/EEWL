@@ -31,6 +31,7 @@ void setup()
 {
   // initialize serial
   Serial.begin(9600);
+  delay(1000);
   
   // read into powerCycles the previous counter value or default value (0)
   if (!pC.get(powerCycles))
