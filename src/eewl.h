@@ -46,6 +46,10 @@ struct EEWL {
     start_addr = start_addr_;
     end_addr = start_addr + blk_num * blk_size;
 
+    #ifdef ESP8266
+    EEPROM.begin((blk_size * blk_num / 256 + 1) * 256);
+    #endif
+
     // search for a valid current data
     blk_addr = 0;
     for (int addr = start_addr; addr < end_addr; addr += blk_size) {
@@ -74,11 +78,21 @@ struct EEWL {
 
     // set all data status bytes as free
     for (int addr = start_addr; addr < end_addr; addr += blk_size) {
+
+      #ifdef ESP8266
+      EEPROM.write(addr,0xff);
+      #else
       EEPROM[addr].update(0xff);
+      #endif
 
       // mark no valid data available
       blk_addr = 0;
     }
+
+    #ifdef ESP8266
+      EEPROM.commit();
+    #endif
+
   }
 
 
@@ -106,7 +120,11 @@ struct EEWL {
     if (blk_addr) {
       // save current block mark and set new mark as free
       blk_mark = EEPROM[blk_addr];
-      EEPROM.update(blk_addr, 0xff);
+      #ifdef ESP8266
+      EEPROM.write(blk_addr,0xff);
+      #else
+      EEPROM.update(blk_addr,0xff);
+      #endif
 
       // point to next data block
       blk_addr += blk_size;
@@ -122,8 +140,16 @@ struct EEWL {
     blk_mark &= 0xff;
     if (blk_mark == 0xff)
       blk_mark = 0xfe;
-    EEPROM.update(blk_addr, blk_mark);
-    EEPROM.put(blk_addr + 1, data);
+    #ifdef ESP8266
+    EEPROM.write(blk_addr,blk_mark);
+    #else
+    EEPROM.update(blk_addr,blk_mark);
+    #endif
+    EEPROM.put(blk_addr + 1,data);
+
+    #ifdef ESP8266
+    EEPROM.commit();
+    #endif
 
   }
 
