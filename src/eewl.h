@@ -61,7 +61,7 @@ struct EEWL {
         // check for other valid data markers
         for (addr += blk_size; addr < end_addr; addr += blk_size) {
 
-          // if found, formatting is needed
+          // if found, formatting is needed (only one valid data block allowed)
           if (EEPROM[addr] != 0xff) {
             fastFormat();
             break;
@@ -85,9 +85,10 @@ struct EEWL {
       EEPROM[addr].update(0xff);
       #endif
 
-      // mark no valid data available
-      blk_addr = 0;
     }
+
+    // mark no valid data available
+    blk_addr = 0;
 
     #ifdef ESP8266
       EEPROM.commit();
