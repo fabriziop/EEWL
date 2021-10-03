@@ -35,14 +35,14 @@ void setup()
   
   // read into powerCycles the previous counter value or default value (0)
   if (!pC.get(powerCycles))
-    Serial.println("setup: first time ever");
+    Serial.println("\nsetup: first time ever");
 
   // increment power cycles counter and save it into EEPROM
   powerCycles++;
   pC.put(powerCycles);
 
   // display power cycles count
-  Serial.print("power cycles = ");
+  Serial.print("\npower cycles = ");
   Serial.println(powerCycles);
 }
 
