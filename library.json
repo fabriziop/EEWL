@@ -6,7 +6,7 @@
         "type": "git",
         "url": "https://github.com/fabriziop/EEWL.git"
     },
-    "version": "0.2.1",
+    "version": "0.2.3",
     "exclude": "tests",
     "examples": "examples/*/*.ino",
     "frameworks": "arduino",
