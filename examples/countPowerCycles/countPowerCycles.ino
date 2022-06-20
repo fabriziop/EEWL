@@ -32,7 +32,10 @@ void setup()
   // initialize serial
   Serial.begin(9600);
   delay(1000);
-  
+
+  // init EEPROM buffer
+  pC.begin();
+    
   // read into powerCycles the previous counter value or default value (0)
   if (!pC.get(powerCycles))
     Serial.println("\nsetup: first time ever");

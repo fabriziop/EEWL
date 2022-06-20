@@ -79,6 +79,11 @@ need to be saved to EEPROM.
   {
     ...
 
+    // init EEWL object
+    sysParams.begin()
+
+    ...
+
     // get saved system parameters or their initial values.
     // From now, a copy of the system parameters is loaded into struct
     // systemParameters available to the application.
@@ -107,9 +112,15 @@ code shows a solution.
 
 .. code:: cpp
 
+...
+
   void setup()
   {
     ...
+
+    // init EEWL object
+    sysParams.begin()
+
     ...
 
     if (sysParms.get(systemParameters))
@@ -186,6 +197,12 @@ EEWL **EEWL** (**data**, int **blk_num**, int **start_add**);
   Returns an **EEWL** object.
 
 
+void **begin** (void);
+
+  Init storage buffer structure. To be called in setup function before any other
+  call to other class methods.
+
+ 
 void **fastFormat** (void);
 
   Format only essential metadata of circular buffer. Required to be run one

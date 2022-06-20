@@ -46,6 +46,12 @@ struct EEWL {
     start_addr = start_addr_;
     end_addr = start_addr + blk_num * blk_size;
 
+  }
+
+
+  // class initializer
+  void begin() {
+
     #ifdef ESP8266
     EEPROM.begin((blk_size * blk_num / 256 + 1) * 256);
     #endif
@@ -196,3 +202,5 @@ struct EEWL {
 };
 
 #endif
+
+/**** end ****/
