@@ -52,8 +52,14 @@ struct EEWL {
   // class initializer
   void begin() {
 
-    #ifdef ESP8266
+    #if defined(ESP8266)
     EEPROM.begin((blk_size * blk_num / 256 + 1) * 256);
+    #elif defined(ESP32)
+    if (!EEPROM.begin((blk_size * blk_num / 256 + 1) * 256)) {
+      Serial.println("ERROR: EEPROM init failure");
+      while(true) delay(1000);
+    }
+    delay(500);
     #endif
 
     // search for a valid current data
@@ -61,17 +67,25 @@ struct EEWL {
     for (int addr = start_addr; addr < end_addr; addr += blk_size) {
 
       // save the first occurrence of a valid data marker
+      #ifdef ESP32
+      if (EEPROM.read(addr) != 0xff) {
+      #else
       if (EEPROM[addr] != 0xff) {
+      #endif
         blk_addr = addr;
 
         // check for other valid data markers
         for (addr += blk_size; addr < end_addr; addr += blk_size) {
 
           // if found, formatting is needed (only one valid data block allowed)
+          #ifdef ESP32
+          if (EEPROM.read(addr) != 0xff) {
+          #else
           if (EEPROM[addr] != 0xff) {
+          #endif
             fastFormat();
             break;
-          }
+          } 
         }
         break;
       }
@@ -85,8 +99,8 @@ struct EEWL {
     // set all data status bytes as free
     for (int addr = start_addr; addr < end_addr; addr += blk_size) {
 
-      #ifdef ESP8266
-      EEPROM.write(addr,0xff);
+      #if defined(ESP8266) || defined(ESP32)
+      EEPROM.write(addr,int(0xff));
       #else
       EEPROM[addr].update(0xff);
       #endif
@@ -96,8 +110,8 @@ struct EEWL {
     // mark no valid data available
     blk_addr = 0;
 
-    #ifdef ESP8266
-      EEPROM.commit();
+    #if defined(ESP8266) || defined(ESP32)
+    EEPROM.commit();
     #endif
 
   }
@@ -112,7 +126,11 @@ struct EEWL {
     // else copy data from eeprom to ram
     uint8_t *ptr = (uint8_t *) &data;
     for(int data_addr = blk_addr + 1; data_addr < blk_addr + blk_size; data_addr++)
+      #ifdef ESP32
+      *ptr++ = byte(EEPROM.read(data_addr));
+      #else
       *ptr++ = EEPROM[data_addr];
+      #endif
 
     // return success to mark presence of valid data
     return 1;
@@ -126,9 +144,13 @@ struct EEWL {
     // if data already stored in buffer ...
     if (blk_addr) {
       // save current block mark and set new mark as free
+      #ifdef ESP32
+      blk_mark = byte(EEPROM.read(blk_addr));
+      #else
       blk_mark = EEPROM[blk_addr];
-      #ifdef ESP8266
-      EEPROM.write(blk_addr,0xff);
+      #endif
+      #if defined(ESP8266) || defined(ESP32)
+      EEPROM.write(blk_addr,int(0xff));
       #else
       EEPROM.update(blk_addr,0xff);
       #endif
@@ -147,14 +169,20 @@ struct EEWL {
     blk_mark &= 0xff;
     if (blk_mark == 0xff)
       blk_mark = 0xfe;
-    #ifdef ESP8266
+    #if defined(ESP8266) || defined(ESP32)
     EEPROM.write(blk_addr,blk_mark);
     #else
     EEPROM.update(blk_addr,blk_mark);
     #endif
+    #ifdef ESP32
+    uint8_t *ptr = (uint8_t *) &data;
+    for(int data_addr = blk_addr + 1; data_addr < blk_addr + blk_size; data_addr++)
+      EEPROM.write(data_addr,*ptr++);
+    #else
     EEPROM.put(blk_addr + 1,data);
+    #endif
 
-    #ifdef ESP8266
+    #if defined(ESP8266) || defined(ESP32)
     EEPROM.commit();
     #endif
 
@@ -186,11 +214,19 @@ struct EEWL {
     for (int addr = start_addr; addr < end_addr;) {
       Serial.print(addr, HEX);
       Serial.print(": ");
+      #ifdef ESP32
+      Serial.print(EEPROM.read(addr), HEX);
+      #else
       Serial.print(EEPROM[addr], HEX);
+      #endif
       Serial.print("-");
       int endaddr = addr + blk_size;
       for (++addr; addr < endaddr; addr++) {
+        #ifdef ESP32
+        Serial.print(EEPROM.read(addr), HEX);
+        #else
         Serial.print(EEPROM[addr], HEX);
+        #endif
         Serial.print(" ");
       }
       Serial.println();
