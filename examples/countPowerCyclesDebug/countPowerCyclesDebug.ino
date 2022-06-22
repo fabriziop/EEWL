@@ -5,8 +5,8 @@
 .kind       : c++ source
 .author     : Fabrizio Pollastri <mxgbot@gmail.com>
 .site       : Revello - Italy
-.creation   : 2-Jan-2021
-.copyright  : (c) 2021 Fabrizio Pollastri
+.creation   : 22-Jun-2022
+.copyright  : (c) 2022 Fabrizio Pollastri
 .license    : GNU Lesser General Public License
 
 .description
@@ -15,12 +15,14 @@
   saved again into EEPROM to be preserved accross power cycles.
   A circular buffer len of 10 is defined. This extends the EEPROM life
   10 times, about 1 million of power cycles.
+  This application outputs the results of mehods dump_control and dump_buffer.
   
 .- */
 
 #define BUFFER_LEN 10     // number of data blocks (1 blk = 1 ulong)
 #define BUFFER_START 0x10 // EEPROM address where buffer starts
 
+#define EEWL_DEBUG        // include debug methods
 #include "eewl.h"
 
 unsigned long powerCycles = 0;
@@ -52,7 +54,10 @@ void setup()
 
 void loop()
 {
-  delay(1000);
+  pC.dump_control();
+  pC.dump_buffer();
+  Serial.println("stop here");
+  while(true) delay(1000);
 }
 
 /**** END ****/
