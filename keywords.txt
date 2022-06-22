@@ -12,6 +12,7 @@ EEWL	KEYWORD1
 # Methods and Functions	(KEYWORD2)
 #######################################
 
+begin	KEYWORD2
 fastFormat	KEYWORD2
 get	KEYWORD2
 put	KEYWORD2

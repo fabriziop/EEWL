@@ -38,6 +38,8 @@ Features
 * Same application, multiple buffers are allowed.
 * Very low EEPROM data overhead: 1 byte for each circular buffer block. 
 * Depends only on Arduino EEPROM library.
+* Supports AVR328p, ESP8266, ESP32 processors.
+* Tested on arduino nano, nodeMCU 8266, nodeMCU 32S boards.
 
 
 Quick start
