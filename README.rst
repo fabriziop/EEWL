@@ -114,7 +114,7 @@ code shows a solution.
 
 .. code:: cpp
 
-...
+  ...
 
   void setup()
   {
@@ -254,6 +254,6 @@ Copyright
 =========
 
 EEWL library is authored by Fabrizio Pollastri <mxgbot_a_t_gmail.com>,
-year 2017-2021, under the GNU Lesser General Public License version 3.
+years 2017-2022, under the GNU Lesser General Public License version 3.
 
 .. ==== END
