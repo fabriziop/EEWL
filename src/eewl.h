@@ -52,6 +52,7 @@ struct EEWL {
   // class initializer
   void begin() {
 
+    #ifndef EEPROM_PROGRAM_BEGIN
     #if defined(ESP8266)
     EEPROM.begin((blk_size * blk_num / 256 + 1) * 256);
     #elif defined(ESP32)
@@ -60,6 +61,7 @@ struct EEWL {
       while(true) delay(1000);
     }
     delay(500);
+    #endif
     #endif
 
     // search for a valid current data

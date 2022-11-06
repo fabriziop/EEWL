@@ -169,6 +169,28 @@ each write to the circular buffer requires 5 bytes, altogether 50 bytes
 of EEPROM are needed.
 
 
+ESP8266 and ESP32 caveat
+========================
+
+Since ESP8266 and ESP32 processor boards simulate EEPROM using a RAM
+buffer and FLASH EPROM, they needs same sort of begin call before
+reading or writing the EEPROM. This code is embedded into the **begin**
+method of EEWL. This means that **EEWL::begin** must be called before
+any other EEWL method.
+
+Moreover, if multiple instances of EEWL are used and/or if other program
+parts needs their own EEPROM buffer, an explicit EEPROM begin call must
+be put in the application before any access to the EEPROM. This must be
+done defining the symbol **EEPROM_PROGRAM_BEGIN** before any include
+involving the EEPROM and with the call
+**EEPROM.begin(<required_eeprom_size>)** in the arduino **setup**
+function.
+
+AVR processor boards have a true EEPROM, so they do not need any EEPROM
+begin and multiple instances of EEWL and/or other program parts using
+EEPROM do not need any special provision to coexists in the same program.
+
+
 Module reference
 ================
 
@@ -195,6 +217,7 @@ EEWL **EEWL** (**data**, int **blk_num**, int **start_add**);
   **blk_num**: circular buffer length as number of data blocks.
 
   **start_add**: EEPROM start address where to allocate the circular buffer.
+  WARNING: **start_add** = 0 is not allowed.
 
   Returns an **EEWL** object.
 
@@ -208,8 +231,9 @@ void **begin** (void);
 void **fastFormat** (void);
 
   Format only essential metadata of circular buffer. Required to be run one
-  time before the first EEPROM put/get. Automatically called by class
-  contructor. Can be called to clear the whole circular buffer.
+  time before the first EEPROM put/get. Called by **begin** if it does not
+  found a well formatted circular buffer.
+  Can be called to clear the whole circular buffer.
 
  
 void **put** (**data**);
