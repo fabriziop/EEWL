@@ -34,7 +34,7 @@ Features
 
 * API interface like Arduino EEPROM library.
 * Any C++ data type is allowed.
-* Multiple data amd multiple types can be managed as a single C++ struct.
+* Multiple data and multiple types can be managed as a single C++ struct.
 * Same application, multiple buffers are allowed.
 * Very low EEPROM data overhead: 1 byte for each circular buffer block. 
 * Depends only on Arduino EEPROM library.
@@ -188,7 +188,7 @@ function.
 
 AVR processor boards have a true EEPROM, so they do not need any EEPROM
 begin and multiple instances of EEWL and/or other program parts using
-EEPROM do not need any special provision to coexists in the same program.
+EEPROM do not need any special provision to coexist in the same program.
 
 
 Module reference
