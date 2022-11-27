@@ -111,23 +111,57 @@ struct EEWL {
 
     // search for a valid current data
     blk_addr = 0;
+    int blocks_addr[2];
+    int blocks_count = 0;
     for (int addr = start_addr; addr < end_addr; addr += blk_size) {
 
-      // save the first occurrence of a valid data marker
+      // find up to two occurrences of a valid data marker
       if (EE_READ(addr) != 0xff) {
-        blk_addr = addr;
+	
+	// if more than two valid block, formatting is needed
+	if (++blocks_count > 2) {
+          fastFormat();
+          return;
+	}
+	  
+        blocks_addr[blocks_count-1] = addr;
 
-        // check for other valid data markers
-        for (addr += blk_size; addr < end_addr; addr += blk_size) {
-
-          // if found, formatting is needed (only one valid data block allowed)
-          if (EE_READ(addr) != 0xff) {
-            fastFormat();
-            break;
-          } 
-        }
-        break;
       }
+    }
+
+    // manage the number of valid blocks found (0,1,2)
+    switch (blocks_count) {
+
+      // buffer is empty
+      case 0:
+	break;
+
+      // regular case: one valid data block.
+      case 1:
+	blk_addr = blocks_addr[0];
+	break;
+
+      // incomplete put execution: interrupted by power off.
+      // in this case the two block must be consecutive, check it.
+      case 2:
+
+	// regular consecutive blocks
+	if (blocks_addr[0] + blk_size == blocks_addr[1]) {
+	  blk_addr = blocks_addr[1];
+	  EE_WRITE(blocks_addr[0],0xff);
+	  break;
+	}
+
+	// consecutive blocks wrapped around the end of buffer
+	if (blocks_addr[0] == start_addr) {
+	  blk_addr = start_addr;
+	  EE_WRITE(blocks_addr[1],0xff);
+	  break;
+	}
+
+	// non consecutive blocks, formatting is needed.
+	fastFormat();
+
     }
   }
 
@@ -159,7 +193,6 @@ struct EEWL {
     uint8_t *ptr = (uint8_t *) &data;
     for(int data_addr = blk_addr + 1; data_addr < blk_addr + blk_size; data_addr++)
       *ptr++ = EE_READ(data_addr);
-      //*ptr++ = byte(EE_READ(data_addr));
 
     // return success to mark presence of valid data
     return 1;
@@ -170,30 +203,46 @@ struct EEWL {
   // write data to EEPROM
   template <typename T> void put(T &data) {
 
+    int old_blk_addr;
+    int new_blk_addr;
+
     // if data already stored in buffer ...
     if (blk_addr) {
-      // save current block mark and set new mark as free
+
+      // save current block address and mark and set new mark as free
+      old_blk_addr = blk_addr;
       blk_mark = EE_READ(blk_addr);
-      EE_WRITE(blk_addr,0xff);
 
       // point to next data block
       blk_addr += blk_size;
       if (blk_addr >= end_addr)
         blk_addr = start_addr;
     }
-    else
+    // else: no data already stored in buffer ...
+    else {
+      old_blk_addr = 0;
       blk_addr = start_addr;
+    }
 
-    // write data block data mark and data
+    // save new block address
+    new_blk_addr = blk_addr;
+
+    // write data
     blk_mark <<= 1;
     blk_mark |= 1;
     blk_mark &= 0xff;
     if (blk_mark == 0xff)
       blk_mark = 0xfe;
-    EE_WRITE(blk_addr,blk_mark);
     uint8_t *ptr = (uint8_t *) &data;
     for(int data_addr = blk_addr + 1; data_addr < blk_addr + blk_size; data_addr++)
       EE_WRITE(data_addr,*ptr++);
+
+    // write data block data mark
+    EE_WRITE(new_blk_addr,blk_mark);
+
+    // if it exists, mark old block as free
+    if (old_blk_addr)
+      EE_WRITE(old_blk_addr,0xff);
 
     #if defined(ESP8266) || defined(ESP32)
     EEPROM.commit();
