@@ -36,6 +36,7 @@ Features
 * Any C++ data type is allowed.
 * Multiple data and multiple types can be managed as a single C++ struct.
 * Same application, multiple buffers are allowed.
+* Power off safe during buffer writing, no corrupted buffer.
 * Very low EEPROM data overhead: 1 byte for each circular buffer block. 
 * Depends only on Arduino EEPROM library.
 * Supports AVR328p, ESP8266, ESP32 processors.
