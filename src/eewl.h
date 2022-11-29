@@ -76,6 +76,8 @@ struct EEWL {
   // class constructor
   template <typename T> EEWL(T &data, int blk_num_, int start_addr_) {
 
+    (void)data;
+
     // allocate and init control vars
     blk_size = sizeof(T) + 1;
     blk_num = blk_num_;
