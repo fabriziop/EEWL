@@ -170,11 +170,11 @@ each write to the circular buffer requires 5 bytes, altogether 50 bytes
 of EEPROM are needed.
 
 
-ESP8266 and ESP32 caveat
-========================
+ESP8266, ESP32 and RISC-V caveat
+================================
 
-Since ESP8266 and ESP32 processor boards simulate EEPROM using a RAM
-buffer and FLASH EPROM, they needs same sort of begin call before
+Since ESP8266, ESP32 and RISC-V processor boards simulate EEPROM using
+a RAM buffer and FLASH EPROM, they needs same sort of begin call before
 reading or writing the EEPROM. This code is embedded into the **begin**
 method of EEWL. This means that **EEWL::begin** must be called before
 any other EEWL method.
@@ -195,9 +195,9 @@ EEPROM do not need any special provision to coexist in the same program.
 Module reference
 ================
 
-The EEWL library is implemented as a single C++ class. An EEWL object needs
-to be instantiated with the proper parameters to manage the write/read
-operations in the circular buffer.
+The EEWL library is implemented as a single C++ class. An EEWL object
+needs to be instantiated with the proper parameters to manage the
+write/read operations in the circular buffer.
 
 
 Objects and methods
