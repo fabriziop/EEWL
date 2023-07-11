@@ -35,7 +35,7 @@ Features
 * API interface like Arduino EEPROM library.
 * Any C++ data type is allowed.
 * Multiple data and multiple types can be managed as a single C++ struct.
-* Same application, multiple buffers are allowed.
+* Multiple EEWL instances are allowed in the same application.
 * Power off safe during buffer writing, no corrupted buffer.
 * Very low EEPROM data overhead: 1 byte for each circular buffer block. 
 * Depends only on Arduino EEPROM library.
@@ -179,13 +179,8 @@ reading or writing the EEPROM. This code is embedded into the **begin**
 method of EEWL. This means that **EEWL::begin** must be called before
 any other EEWL method.
 
-Moreover, if multiple instances of EEWL are used and/or if other program
-parts needs their own EEPROM buffer, an explicit EEPROM begin call must
-be put in the application before any access to the EEPROM. This must be
-done defining the symbol **EEPROM_PROGRAM_BEGIN** before any include
-involving the EEPROM and with the call
-**EEPROM.begin(<required_eeprom_size>)** in the arduino **setup**
-function.
+Multiple instances of EEWL can be also used, they are automatically managed
+for these types of processors whitin the calls to **EEWL::begin**.
 
 AVR processor boards have a true EEPROM, so they do not need any EEPROM
 begin and multiple instances of EEWL and/or other program parts using

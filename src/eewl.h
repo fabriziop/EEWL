@@ -44,7 +44,7 @@
   #ifdef ESP32
     #define EE_READ( addr ) (EEPROM.read((int)( addr )))
   #else
-    #define EE_READ( addr ) (EEPROM[(int)( addr )])
+    #define EE_READ( addr ) (EEPROM[ (int)( addr ) ])
   #endif
   #include <EEPROM.h>
 #endif
@@ -63,7 +63,8 @@ struct EEWL {
   int end_addr;
 
   #if (defined(ESP8266) || defined(ESP32)) && !defined EEWL_RAM
-  bool eepromBegin = true;
+  static inline int highest_end_addr = 0;
+  static inline bool eepromBeginDone = false;
   #endif
 
   #ifdef EEWL_RAM
@@ -84,7 +85,10 @@ struct EEWL {
     start_addr = start_addr_;
     end_addr = start_addr + blk_num * blk_size;
 
-    #ifdef EEWL_RAM
+    #if (defined(ESP8266) || defined(ESP32)) && !defined EEWL_RAM
+    if (highest_end_addr < end_addr)
+      highest_end_addr = end_addr;
+    #else
       buffer = (uint8_t *)malloc(end_addr);
     #endif
 
@@ -94,21 +98,19 @@ struct EEWL {
   // class initializer
   void begin() {
 
-    #ifndef EEPROM_PROGRAM_BEGIN
     #if !defined(EEWL_RAM) && !defined(__AVR__)
-    if (eepromBegin) {
+    if (!eepromBeginDone) {
       #if defined(ESP8266)
-      EEPROM.begin((blk_size * blk_num / 256 + 1) * 256);
+      EEPROM.begin((highest_end_addr / 256 + 1) * 256);
       #elif defined(ESP32)
-      if (!EEPROM.begin((blk_size * blk_num / 256 + 1) * 256)) {
+      if (!EEPROM.begin((highest_end_addr / 256 + 1) * 256)) {
         Serial.println("ERROR: EEPROM init failure");
         while(true) delay(1000);
       }
       delay(500);
       #endif
-      eepromBegin = false;
+      eepromBeginDone = true;
     }
-    #endif
     #endif
 
     // search for a valid current data
