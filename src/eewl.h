@@ -62,7 +62,7 @@ struct EEWL {
   int start_addr;
   int end_addr;
 
-  #if (defined(ESP8266) || defined(ESP32)) && !defined EEWL_RAM
+  #if (defined(ESP8266) || defined(ESP32)) && !defined(EEWL_RAM)
   static inline int highest_end_addr = 0;
   static inline bool eepromBeginDone = false;
   #endif
@@ -85,11 +85,11 @@ struct EEWL {
     start_addr = start_addr_;
     end_addr = start_addr + blk_num * blk_size;
 
-    #if (defined(ESP8266) || defined(ESP32)) && !defined EEWL_RAM
+    #if defined(EEWL_RAM)
+    buffer = (uint8_t *)malloc(end_addr);
+    #elif defined(ESP8266) || defined(ESP32)
     if (highest_end_addr < end_addr)
       highest_end_addr = end_addr;
-    #else
-      buffer = (uint8_t *)malloc(end_addr);
     #endif
 
   }
@@ -180,7 +180,7 @@ struct EEWL {
     // mark no valid data available
     blk_addr = 0;
 
-    #if defined(ESP8266) || defined(ESP32)
+    #if (defined(ESP8266) || defined(ESP32)) && !defined(EEWL_RAM)
     EEPROM.commit();
     #endif
 
@@ -248,7 +248,7 @@ struct EEWL {
     if (old_blk_addr)
       EE_WRITE(old_blk_addr,0xff);
 
-    #if defined(ESP8266) || defined(ESP32)
+    #if (defined(ESP8266) || defined(ESP32)) && !defined(EEWL_RAM)
     EEPROM.commit();
     #endif
 

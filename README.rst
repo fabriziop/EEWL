@@ -187,6 +187,17 @@ begin and multiple instances of EEWL and/or other program parts using
 EEPROM do not need any special provision to coexist in the same program.
 
 
+Power off/on by USB connector unplug/plug caveat
+================================================
+
+When an arduino board is connected to a computer via USB and a power off/on cycle
+is done by unplug/plug the USB connector, the setup function in the sketch may
+be called twice. I experienced this behaviour on arduino nano and on ESP32.
+In this case, the EEWL examples that count the number of power cycles,
+increment by two at each cycle. A simple workaround is to add a 2/3 seconds
+delay at the beginning of setup function.
+
+
 Module reference
 ================
 
@@ -274,6 +285,6 @@ Copyright
 =========
 
 EEWL library is authored by Fabrizio Pollastri <mxgbot_a_t_gmail.com>,
-years 2017-2022, under the GNU Lesser General Public License version 3.
+years 2017-2023, under the GNU Lesser General Public License version 3.
 
 .. ==== END
