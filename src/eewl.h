@@ -36,10 +36,10 @@
 #else
   #ifdef __AVR__
     #define EE_WRITE( addr , val ) (EEPROM[ (int)( addr )  ].update( val ))
-  #elif defined(ESP8266) || defined(ESP32)
+  #elif defined(ESP8266) || defined(ESP32) || defined(TARGET_RP2040)
     #define EE_WRITE( addr , val ) (EEPROM.write((int)( addr ),( val )))
   #else
-    #error ERROR: unsupported architecture 
+    #error ERROR: unsupported architecture
   #endif
   #ifdef ESP32
     #define EE_READ( addr ) (EEPROM.read((int)( addr )))
@@ -62,7 +62,7 @@ struct EEWL {
   int start_addr;
   int end_addr;
 
-  #if (defined(ESP8266) || defined(ESP32)) && !defined(EEWL_RAM)
+  #if (defined(ESP8266) || defined(ESP32)) || defined(TARGET_RP2040) && !defined(EEWL_RAM)
   static inline int highest_end_addr = 0;
   static inline bool eepromBeginDone = false;
   #endif
@@ -87,7 +87,7 @@ struct EEWL {
 
     #if defined(EEWL_RAM)
     buffer = (uint8_t *)malloc(end_addr);
-    #elif defined(ESP8266) || defined(ESP32)
+    #elif defined(ESP8266) || defined(ESP32) || defined(TARGET_RP2040)
     if (highest_end_addr < end_addr)
       highest_end_addr = end_addr;
     #endif
@@ -100,7 +100,7 @@ struct EEWL {
 
     #if !defined(EEWL_RAM) && !defined(__AVR__)
     if (!eepromBeginDone) {
-      #if defined(ESP8266)
+      #if defined(ESP8266) || defined(TARGET_RP2040)
       EEPROM.begin((highest_end_addr / 256 + 1) * 256);
       #elif defined(ESP32)
       if (!EEPROM.begin((highest_end_addr / 256 + 1) * 256)) {
@@ -121,13 +121,13 @@ struct EEWL {
 
       // find up to two occurrences of a valid data marker
       if (EE_READ(addr) != 0xff) {
-	
+
 	// if more than two valid block, formatting is needed
 	if (++blocks_count > 2) {
           fastFormat();
           return;
 	}
-	  
+
         blocks_addr[blocks_count-1] = addr;
 
       }
@@ -180,14 +180,14 @@ struct EEWL {
     // mark no valid data available
     blk_addr = 0;
 
-    #if (defined(ESP8266) || defined(ESP32)) && !defined(EEWL_RAM)
+    #if (defined(ESP8266) || defined(ESP32)) || defined(TARGET_RP2040) && !defined(EEWL_RAM)
     EEPROM.commit();
     #endif
 
   }
 
 
-  // read data from EEPROM 
+  // read data from EEPROM
   template <typename T> int get(T &data) {
 
     // if no valid data into eeprom, return a ram data null pointer
@@ -200,9 +200,9 @@ struct EEWL {
 
     // return success to mark presence of valid data
     return 1;
-    
+
   }
- 
+
 
   // write data to EEPROM
   template <typename T> void put(T &data) {
@@ -248,7 +248,7 @@ struct EEWL {
     if (old_blk_addr)
       EE_WRITE(old_blk_addr,0xff);
 
-    #if (defined(ESP8266) || defined(ESP32)) && !defined(EEWL_RAM)
+    #if (defined(ESP8266) || defined(ESP32)) || defined(TARGET_RP2040) && !defined(EEWL_RAM)
     EEPROM.commit();
     #endif
 
