@@ -39,8 +39,9 @@ Features
 * Power off safe during buffer writing, no corrupted buffer.
 * Very low EEPROM data overhead: 1 byte for each circular buffer block. 
 * Depends only on Arduino EEPROM library.
-* Supports AVR328p, ESP8266, ESP32, RISC-V processors.
-* Tested on arduino nano, nodeMCU 8266, nodeMCU 32S, ESP32-C3 boards.
+* Supports AVR328p, ESP8266, ESP32, RISC-V, RP2040 processors.
+* Tested on Arduino nano, nodeMCU 8266, nodeMCU 32S, ESP32-C3,
+  Raspberry Pi Pico boards.
 
 
 Quick start
